@@ -3,7 +3,6 @@ package agregator
 import "fmt"
 
 func (agr *Agregator) CreateTableAgr() {
-	//TODO таблица с постами
 
 	sql := `
 		
@@ -26,32 +25,35 @@ func (agr *Agregator) CreateTableAgr() {
 CREATE TABLE IF NOT EXISTS forum (
 	slug			CITEXT			 				NOT NULL	PRIMARY KEY,
 	title			VARCHAR							NOT NULL,
-	owner_nickname	CITEXT							NOT NULL 	REFERENCES users(nickname),
+	nickname		CITEXT							NOT NULL 	REFERENCES users(nickname),
 	posts			INTEGER							DEFAULT 0,
 	threads			INTEGER							DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS thread (
 	id				BIGSERIAL									PRIMARY KEY,
-	slug			CITEXT			UNIQUE,
-	author_nickname	CITEXT							NOT NULL	REFERENCES users(nickname),
-	forum_slug		CITEXT							NOT NULL	REFERENCES forum(slug),
+	slug			CITEXT							NOT NULL,
+	author			CITEXT							NOT NULL	REFERENCES users(nickname),
+	forum			CITEXT							NOT NULL	REFERENCES forum(slug),
 	created			TIMESTAMP WITH TIME ZONE		DEFAULT NOW(),
 	title			VARCHAR							NOT NULL,
 	message			VARCHAR							NOT NULL,
+	roots			INTEGER							NOT NULL	DEFAULT 0,
 	votes			INTEGER							DEFAULT 0
 );
 
+create unique index if not exists thread_slug_unique on thread(slug) where slug <> '';
+
 CREATE TABLE IF NOT EXISTS post (
 	id					BIGSERIAL								PRIMARY KEY,
-	author_nickname		CITEXT						NOT NULL	REFERENCES users(nickname),
-	forum_slug			CITEXT						NOT NULL	REFERENCES forum(slug),
-	thread_slug			CITEXT									REFERENCES thread(slug),
+	author				CITEXT						NOT NULL	REFERENCES users(nickname),
+	forum				CITEXT						NOT NULL	REFERENCES forum(slug),
 	thread_id			BIGSERIAL								REFERENCES thread(id),
 	created				TIMESTAMP WITH TIME ZONE	DEFAULT NOW(),
 	isEdited			BOOLEAN						DEFAULT FALSE,
 	message				VARCHAR						NOT NULL,
-	parent				BIGINT						NULL		REFERENCES post(id)
+	path				TEXT						NOT NULL DEFAULT 0,
+	children			INTEGER						NOT NULL  DEFAULT 0	
 );
 
 CREATE TABLE IF NOT EXISTS vote (
@@ -63,8 +65,8 @@ CREATE TABLE IF NOT EXISTS vote (
 );
 
 `
-
+	//parent				BIGINT						NULL		REFERENCES post(id)
 	_, err := agr.Connection.Exec(sql)
 	fmt.Println(err)
-
+	// 	thread				CITEXT						NOT NULL	REFERENCES thread(slug),
 }
