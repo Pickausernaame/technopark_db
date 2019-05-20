@@ -1,7 +1,6 @@
 package agregator
 
 import (
-	"fmt"
 	"technopark_db/models"
 )
 
@@ -12,7 +11,5 @@ func (agr *Agregator) CreateThreadAgr(thread models.Thread) (resThread models.Th
 				RETURNING author, created, forum, id, message, slug, title, votes;`
 	err = agr.Connection.QueryRow(sql, thread.Author, thread.Created, thread.Forum, thread.Message, thread.Slug,
 		thread.Title).Scan(&resThread.Author, &resThread.Created, &resThread.Forum, &resThread.Id, &resThread.Message, &resThread.Slug, &resThread.Title, &resThread.Votes)
-	fmt.Println(thread.Slug)
-	fmt.Println(err)
 	return
 }

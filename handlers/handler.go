@@ -1,9 +1,21 @@
 package handlers
 
-import "technopark_db/agregator"
+import (
+	"github.com/jackc/pgx"
+	"technopark_db/agregator"
+)
 
 type Handler struct {
 	Agregator *agregator.Agregator
+}
+
+func CreateHandler(conn *pgx.ConnPoolConfig) *Handler {
+	Pool, _ := pgx.NewConnPool(*conn)
+	var h = &Handler{
+		Agregator: &agregator.Agregator{},
+	}
+	h.Agregator.Connection = Pool
+	return h
 }
 
 var e = map[string]string{

@@ -2,6 +2,7 @@ package application
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx"
 	"technopark_db/handlers"
 )
 
@@ -10,13 +11,23 @@ type App struct {
 	Handler *handlers.Handler
 }
 
+func CreateApp(conn *pgx.ConnPoolConfig) *App {
+	var a App
+	a.Handler = handlers.CreateHandler(conn)
+	return &a
+}
+
 func (a *App) CreateRouter() (router *gin.Engine) {
 	a.Router = gin.New()
 	a.Router.Use(gin.Logger())
+	a.Router.Use(gin.Recovery())
+	//a.Handler.Agregator.ClearTableAgr()
 	a.Handler.Agregator.CreateTableAgr()
+
 	// Создаем таблицы в бд
 	api := a.Router.Group("/api")
 	{
+		api.GET("", a.Handler.Connected)
 		api.GET("/CreateTables", a.Handler.CreateTables)
 		// Чистим бд
 		api.GET("/ClearTables", a.Handler.ClearTables)
@@ -30,25 +41,25 @@ func (a *App) CreateRouter() (router *gin.Engine) {
 
 		api.GET("/forum/:slug/threads", a.Handler.GetThreads)
 
-		//.Router.GET("/forum/:slug/users", a.Handler.CreatePost)
+		api.GET("/forum/:slug/users", a.Handler.GetForumUsers)
 
-		//a.Router.GET("/post/:id/details", a.Handler.CreatePost)
+		api.GET("/post/:id/details", a.Handler.GetPostDetails)
 
-		//a.Router.POST("/post/:id/details", a.Handler.CreatePost)
+		api.POST("/post/:id/details", a.Handler.UpdatePost)
 
 		api.POST("/service/clear", a.Handler.CreateTables)
 
-		//a.Router.GET("/service/status", a.Handler.CreatePost)
+		api.GET("/service/status", a.Handler.ServiceStatus)
 		// Создание поста
 		api.POST("/thread/:slug_or_id/create", a.Handler.CreatePost)
 		// Получение информации о ветке
-		//a.Router.GET("/thread/:slug_or_id/details", a.Handler.GetThread)
+		api.GET("/thread/:slug_or_id/details", a.Handler.GetThreadDetails)
 		//// Обновление информации о ветки
-		//a.Router.POST("/thread/:slug_or_id/details", a.Handler.UpdateThreadDetails)
+		api.POST("/thread/:slug_or_id/details", a.Handler.UpdateThreadDetails)
 		// Получение постов из текущей ветки
-		//a.Router.GET("/thread/:slug_or_id/posts", a.Handler.GetThreadPosts)
+		api.GET("/thread/:slug_or_id/posts", a.Handler.GetThreadPosts)
 		// Голосование
-		//a.Router.POST("/thread/:slug_or_id/vote", a.Handler.SetThreadVote)
+		api.POST("/thread/:slug_or_id/vote", a.Handler.SetThreadVote)
 
 		api.POST("/user/:nickname/create", a.Handler.CreateUser)
 

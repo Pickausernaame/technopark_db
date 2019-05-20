@@ -2,6 +2,7 @@ package models
 
 import "time"
 
+//easyjson:json
 type Thread struct {
 	Author   string    `json:"author"`
 	Created  time.Time `json:"created"`

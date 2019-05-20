@@ -16,45 +16,44 @@ func NodeSetter(numb int) string {
 }
 
 func (h *Handler) CreatePost(c *gin.Context) {
-	var posts []models.Post
-	_ = json.NewDecoder(c.Request.Body).Decode(&posts)
+	var posts models.Posts
+	err := json.NewDecoder(c.Request.Body).Decode(&posts)
+	buf, _ := c.GetRawData()
+	created := strings.Contains(string(buf), "created")
+	fmt.Println(created)
+	slug_or_id := c.Param("slug_or_id")
+	id, err := strconv.Atoi(slug_or_id)
+	if err != nil {
+		thread, _ := h.Agregator.GetThreadAgr(slug_or_id)
+		for _, p := range posts {
+			p.ThreadId = thread.Id
+			p.Forum = thread.Forum
+		}
+		posts, err = h.Agregator.CreatePostBySlugAgr(posts, slug_or_id, created)
+		if err != nil {
+			c.JSON(404, err)
+			return
+		}
+	} else {
+		posts, err = h.Agregator.CreatePostByIdAgr(posts, id, created)
+		if err != nil {
+			c.JSON(404, err)
+			return
+		}
+	}
+
 	if len(posts) == 0 {
 		emptyArray := make([]int64, 0)
 		c.JSON(201, emptyArray)
 		return
 	}
-	slug_or_id := c.Param("slug_or_id")
-	id, err := strconv.Atoi(slug_or_id)
-	var outPosts []models.Post
-	if err != nil {
-		thread, _ := h.Agregator.GetThreadAgr(slug_or_id)
-		for _, p := range posts {
-
-			p.ThreadId = thread.Id
-			p.Forum = thread.Forum
-		}
-		posts, err = h.Agregator.CreatePostBySlugAgr(posts, slug_or_id)
-		if err != nil {
-			fmt.Println(err)
-			c.JSON(404, err)
-			return
-		}
-		//c.JSON(201, outPosts)
-	} else {
-		posts, err = h.Agregator.CreatePostByIdAgr(posts, id)
-		if err != nil {
-			fmt.Println(err)
-			c.JSON(404, err)
-			return
-		}
-		//c.JSON(201, outPosts)
-	}
 	var postsConnections agregator.PostConnections
 	parentIds := make([]int, len(posts))
-	for i := range outPosts {
-		if outPosts[i].Parent != 0 {
+	for i := range posts {
+		if posts[i].Parent != 0 {
 			parentIds = append(parentIds, posts[i].Parent)
 		}
+
 	}
 	postsConnections, err = h.Agregator.GetPostConnections(parentIds)
 	if err != nil {
@@ -62,39 +61,43 @@ func (h *Handler) CreatePost(c *gin.Context) {
 		c.JSON(404, err)
 		return
 	}
-	var NumberOfRoots int
+
+	NumberOfRoots, err := h.Agregator.GetRoots(posts[0].ThreadId)
 	for i := range posts {
 		if posts[i].Parent == 0 {
 			NumberOfRoots++
 			posts[i].Path = NodeSetter(NumberOfRoots)
-		} else { // если родитель - post
+		} else {
 			parentId := posts[i].Parent
-			parentPostConnections := postsConnections[parentId]
-			fmt.Println(parentPostConnections.ThreadId, posts[i].ThreadId)
-			if parentPostConnections.ThreadId != posts[i].ThreadId {
-				fmt.Println(err)
-				c.JSON(409, "error")
+
+			parentPostConnection := postsConnections[parentId]
+
+			if parentPostConnection.ThreadId != posts[i].ThreadId {
+				c.JSON(409, models.Thread{})
 				return
 			}
-			parentPostConnections.NumberOfChildren++
-			posts[i].Path = parentPostConnections.MaterializedPath + "." + NodeSetter(parentPostConnections.NumberOfChildren)
-			postsConnections[parentId] = parentPostConnections
-		}
-	}
-	for i := range postsConnections {
-		for j := range posts {
-			if i == posts[j].Id {
-				posts[j].Childrens = postsConnections[i].NumberOfChildren
-			}
+			parentPostConnection.NumberOfChildren++
+			posts[i].Path = parentPostConnection.MaterializedPath + "." + NodeSetter(parentPostConnection.NumberOfChildren)
+			postsConnections[parentId] = parentPostConnection
 		}
 	}
 
+	err = h.Agregator.PostChildrenUpdate(postsConnections)
+	if err != nil {
+		c.JSON(404, err)
+		return
+	}
 	err = h.Agregator.PostsCreateInsert(posts, NumberOfRoots)
 
 	if err != nil {
 		fmt.Println(err)
+
 		c.JSON(404, err)
 		return
+	}
+	err = h.Agregator.InsertUsersInForum(posts)
+	for _, p := range posts {
+		fmt.Println(p.Created)
 	}
 	c.JSON(201, posts)
 }

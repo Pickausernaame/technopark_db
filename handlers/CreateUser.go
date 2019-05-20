@@ -26,17 +26,8 @@ func (h *Handler) CreateUser(c *gin.Context) {
 			}
 			c.Writer.WriteHeader(409)
 			c.JSON(409, resUsers)
-			//err = json.NewEncoder(c.Writer).Encode(resUsers)
 			return
 		}
 	}
-	c.Writer.WriteHeader(201)
-
-	//err = json.NewEncoder(c.Writer).Encode(newUser)
-	//res, err := json.Marshal(newUser)
 	c.JSON(201, newUser)
-	if err != nil {
-		fmt.Println("Error in CreateUser handler 3")
-		fmt.Println(err)
-	}
 }

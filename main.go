@@ -2,9 +2,7 @@ package main
 
 import (
 	"github.com/jackc/pgx"
-	"technopark_db/agregator"
 	"technopark_db/application"
-	"technopark_db/handlers"
 )
 
 func main() {
@@ -17,17 +15,12 @@ func main() {
 		Database:  "techno",
 		TLSConfig: nil,
 	}
-
-	conn, _ := pgx.Connect(conf)
-
-	var a = &application.App{
-		Handler: &handlers.Handler{
-			Agregator: &agregator.Agregator{
-				Connection: conn,
-			},
-		},
+	confPool := pgx.ConnPoolConfig{
+		ConnConfig:     conf,
+		MaxConnections: 16,
 	}
+
+	a := application.CreateApp(&confPool)
 	a.CreateRouter()
 	a.Router.Run()
-
 }

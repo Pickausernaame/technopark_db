@@ -10,7 +10,6 @@ func (agr *Agregator) GetThreadsAgr(slug string, limit int, since time.Time, des
 	sql := `SELECT EXISTS (SELECT true FROM forum WHERE slug = $1);`
 	//sql := `SELECT * FROM forum WHERE slug = $1;`
 	err = agr.Connection.QueryRow(sql, slug).Scan(&exist)
-	fmt.Println(exist)
 	if !exist {
 		return
 	}

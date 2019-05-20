@@ -10,6 +10,7 @@ func (agr *Agregator) CreateForumAgr(forum *models.Forum) (outForum models.Forum
 		VALUES ( $1, $2, (SELECT nickname FROM users
 								WHERE users.nickname = $3))
 		RETURNING slug, title, nickname, posts, threads;`
+
 	err = agr.Connection.QueryRow(sql, forum.Slug, forum.Title, forum.User).Scan(&outForum.Slug, &outForum.Title, &outForum.User, &outForum.Posts, &outForum.Threads)
 	return
 }
