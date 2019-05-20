@@ -2,7 +2,7 @@ package agregator
 
 import (
 	"fmt"
-	"technopark_db/models"
+	"github.com/Pickausernaame/technopark_db/models"
 )
 
 func (agr *Agregator) GetPost(id int) (post models.Post, err error) {

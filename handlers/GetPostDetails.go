@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"strings"
-	"technopark_db/models"
 )
 
 func (h *Handler) GetPostDetails(c *gin.Context) {

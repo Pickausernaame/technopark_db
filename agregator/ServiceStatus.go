@@ -1,6 +1,6 @@
 package agregator
 
-import "technopark_db/models"
+import "github.com/Pickausernaame/technopark_db/models"
 
 func (agr *Agregator) Status() (status models.Service, err error) {
 	// Todo: навесить триггер

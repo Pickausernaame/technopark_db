@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
 	"strconv"
-	"technopark_db/models"
 )
 
 func (h *Handler) UpdatePost(c *gin.Context) {

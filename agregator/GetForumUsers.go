@@ -2,8 +2,8 @@ package agregator
 
 import (
 	"fmt"
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/jackc/pgx"
-	"technopark_db/models"
 )
 
 func (agr *Agregator) GetUsersASC(slug string, lim int, since string) (users []models.User, err error) {

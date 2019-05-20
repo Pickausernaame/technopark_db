@@ -2,10 +2,10 @@ package agregator
 
 import (
 	"fmt"
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/jackc/pgx"
 	"strconv"
 	"strings"
-	"technopark_db/models"
 )
 
 func NodeSetter(numb int) string {

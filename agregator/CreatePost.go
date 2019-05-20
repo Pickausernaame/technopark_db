@@ -2,9 +2,9 @@ package agregator
 
 import (
 	"fmt"
+	"github.com/Pickausernaame/technopark_db/models"
 	"strconv"
 	"strings"
-	"technopark_db/models"
 )
 
 func (agr *Agregator) CreatePostByIdAgr(Posts []models.Post, id int, created bool) (outPosts []models.Post, err error) {

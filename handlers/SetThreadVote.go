@@ -3,9 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
 	"strconv"
-	"technopark_db/models"
 )
 
 func (h *Handler) SetThreadVote(c *gin.Context) {

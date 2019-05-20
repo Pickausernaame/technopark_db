@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
 	"strconv"
-	"technopark_db/models"
 )
 
 func (h *Handler) UpdateThreadDetails(c *gin.Context) {

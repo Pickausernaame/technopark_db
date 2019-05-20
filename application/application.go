@@ -1,9 +1,9 @@
 package application
 
 import (
+	"github.com/Pickausernaame/technopark_db/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx"
-	"technopark_db/handlers"
 )
 
 type App struct {

@@ -1,7 +1,7 @@
 package agregator
 
 import (
-	"technopark_db/models"
+	"github.com/Pickausernaame/technopark_db/models"
 )
 
 func (agr *Agregator) GetThreadAgr(slug string) (curThread models.Thread, err error) {

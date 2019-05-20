@@ -3,11 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Pickausernaame/technopark_db/agregator"
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"strings"
-	"technopark_db/agregator"
-	"technopark_db/models"
 )
 
 func NodeSetter(numb int) string {

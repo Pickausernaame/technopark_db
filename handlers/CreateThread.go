@@ -3,9 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx"
-	"technopark_db/models"
 )
 
 func (h *Handler) CreateThread(c *gin.Context) {

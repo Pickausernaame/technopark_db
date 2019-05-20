@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx"
-	"technopark_db/models"
 )
 
 var (

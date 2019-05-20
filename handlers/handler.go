@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	"github.com/Pickausernaame/technopark_db/agregator"
 	"github.com/jackc/pgx"
-	"technopark_db/agregator"
 )
 
 type Handler struct {
