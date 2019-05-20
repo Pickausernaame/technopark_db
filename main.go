@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/Pickausernaame/technopark_db/application"
 	"github.com/jackc/pgx"
-	"technopark_db/application"
 )
 
 func main() {
