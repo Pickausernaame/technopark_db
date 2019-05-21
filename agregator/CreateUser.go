@@ -28,10 +28,10 @@ func (agr *Agregator) CreateUserAgr(newUser models.User) (err error) {
 	return
 }
 
-func (agr *Agregator) ErrorCreateUserArg(nicname string, email string) (resUsers []models.User, err error) {
+func (agr *Agregator) ErrorCreateUserArg(nickname string, email string) (resUsers []models.User, err error) {
 	sql := `SELECT nickname, fullname, about, email FROM users
 				WHERE nickname = $1 OR email = $2;`
-	rows, err := agr.Connection.Query(sql, nicname, email)
+	rows, err := agr.Connection.Query(sql, nickname, email)
 	fmt.Println(err)
 	defer rows.Close()
 	for rows.Next() {
