@@ -19,7 +19,6 @@ func (agr *Agregator) CreateUserAgr(newUser models.User) (err error) {
 	}()
 
 	_, err = tx.Exec(sql, newUser.Nickname, newUser.Fullname, newUser.About, newUser.Email)
-	fmt.Println("Захожу сюда")
 
 	//err = agr.Connection.QueryRow(sql, newUser.Nickname, newUser.Fullname, newUser.About, newUser.Email).Scan(&resUser.Nickname, &resUser.Fullname, &resUser.About, &resUser.Email)
 	if err != nil {
@@ -29,10 +28,10 @@ func (agr *Agregator) CreateUserAgr(newUser models.User) (err error) {
 	return
 }
 
-func (agr *Agregator) ErrorCreateUserArg(nickname string, email string) (resUsers []models.User, err error) {
+func (agr *Agregator) ErrorCreateUserArg(nicname string, email string) (resUsers []models.User, err error) {
 	sql := `SELECT nickname, fullname, about, email FROM users
 				WHERE nickname = $1 OR email = $2;`
-	rows, err := agr.Connection.Query(sql, nickname, email)
+	rows, err := agr.Connection.Query(sql, nicname, email)
 	defer rows.Close()
 	for rows.Next() {
 		var currentUser models.User
