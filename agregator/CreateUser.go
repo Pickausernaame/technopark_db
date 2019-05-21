@@ -32,10 +32,12 @@ func (agr *Agregator) ErrorCreateUserArg(nicname string, email string) (resUsers
 	sql := `SELECT nickname, fullname, about, email FROM users
 				WHERE nickname = $1 OR email = $2;`
 	rows, err := agr.Connection.Query(sql, nicname, email)
+	fmt.Println(err)
 	defer rows.Close()
 	for rows.Next() {
 		var currentUser models.User
 		err = rows.Scan(&currentUser.Nickname, &currentUser.Fullname, &currentUser.About, &currentUser.Email)
+		fmt.Println(err)
 		resUsers = append(resUsers, currentUser)
 	}
 
