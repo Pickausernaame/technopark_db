@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
@@ -9,8 +10,7 @@ import (
 
 func (h *Handler) UpdateThreadDetails(c *gin.Context) {
 	var update models.Thread
-	buf, _ := c.GetRawData()
-	err := update.UnmarshalJSON(buf)
+	err := json.NewDecoder(c.Request.Body).Decode(&update)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(404, err)
