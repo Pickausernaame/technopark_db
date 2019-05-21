@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"github.com/Pickausernaame/technopark_db/models"
 	"github.com/gin-gonic/gin"
 	"strconv"
@@ -14,8 +15,10 @@ func (h *Handler) UpdatePost(c *gin.Context) {
 	}
 
 	var req models.Post
-	buf, _ := c.GetRawData()
-	err = req.UnmarshalJSON(buf)
+
+	//buf, _ := c.GetRawData()
+	//err = req.UnmarshalJSON(buf)
+	_ = json.NewDecoder(c.Request.Body).Decode(&req)
 	if err != nil {
 		c.JSON(404, err)
 		return
