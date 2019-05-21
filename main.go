@@ -22,5 +22,5 @@ func main() {
 
 	a := application.CreateApp(&confPool)
 	a.CreateRouter()
-	a.Router.Run()
+	a.Router.Run(":5000")
 }
