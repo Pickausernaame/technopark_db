@@ -93,6 +93,16 @@ func (agr *Agregator) CreateTableAgr() {
 		children			INTEGER						NOT NULL 	DEFAULT 0 );
 
 
+create index if not exists "post_materialized_path_flat_sort" on post(thread_id, id);
+
+create index if not exists "post_materialized_path_tree_sort" on post (thread_id, path, id);
+
+create unique index if not exists "post_materialized_path_patent_tree_sort"
+on post (thread_id, substring(path from 1 for 6) desc, substring(path from 8) asc, id);
+
+create index if not exists "thread_created" on thread(forum, created);
+
+
 
 	-- Таблица голосов.
 

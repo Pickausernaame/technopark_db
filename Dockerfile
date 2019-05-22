@@ -39,13 +39,20 @@ RUN /etc/init.d/postgresql start &&\
     /etc/init.d/postgresql stop
 
 USER root
-RUN echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/$POSTGRESQLVERSION/main/pg_hba.conf &&\
-    echo "listen_addresses='*'" >> /etc/postgresql/$POSTGRESQLVERSION/main/postgresql.conf &&\
-    echo "shared_buffers=256MB" >> /etc/postgresql/$POSTGRESQLVERSION/main/postgresql.conf &&\
-    echo "fsync=off" >> /etc/postgresql/$POSTGRESQLVERSION/main/postgresql.conf &&\
-    echo "synchronous_commit=off" >> /etc/postgresql/$POSTGRESQLVERSION/main/postgresql.conf &&\
-    echo "full_page_writes=off" >> /etc/postgresql/$POSTGRESQLVERSION/main/postgresql.conf &&\
-    echo "unix_socket_directories = '/var/run/postgresql'" >> /etc/postgresql/$POSTGRESQLVERSION/main/postgresql.conf
+RUN printf "\n\
+    fsync                = 'off'     \n\
+    synchronous_commit   = 'off'     \n\
+    full_page_writes     = 'off'     \n\
+    autovacuum           = 'off'     \n\
+    wal_level            = 'minimal' \n\
+    max_wal_senders      = '0'       \n\
+    wal_writer_delay     = '2000ms'  \n\
+    shared_buffers       = '512MB'   \n\
+    effective_cache_size = '1024MB'  \n\
+    work_mem             = '16MB'    \n\
+    log_min_messages     = 'panic'   \n" >> \
+        "/etc/postgresql/10/main/postgresql.conf"
+
 EXPOSE 5432
 
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]

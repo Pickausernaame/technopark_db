@@ -25,26 +25,53 @@ func (agr *Agregator) GetVote(Nickname string, id int) (vote models.Vote, err er
 }
 
 func (agr *Agregator) UpdateVote(vote models.Vote) (err error) {
+	tx, err := agr.Connection.Begin()
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+		return
+	}()
 	sql := `
 	UPDATE vote SET voice = $3
 		WHERE nickname = $1 AND thread_id = $2;`
-	_, err = agr.Connection.Exec(sql, vote.Nickname, vote.Id, vote.Voice)
+	_, err = tx.Exec(sql, vote.Nickname, vote.Id, vote.Voice)
 	return
 }
 
 func (agr *Agregator) InsertVote(vote models.Vote) (err error) {
+	tx, err := agr.Connection.Begin()
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+		return
+	}()
 	sql := `
 	INSERT INTO vote (nickname, thread_id, voice)
 		VALUES($1, $2, $3);`
-	_, err = agr.Connection.Exec(sql, vote.Nickname, vote.Id, vote.Voice)
+	_, err = tx.Exec(sql, vote.Nickname, vote.Id, vote.Voice)
 	return
 }
 
 func (agr *Agregator) UpdateThreadVote(vote int, id int) (thread models.Thread, err error) {
+	tx, err := agr.Connection.Begin()
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+		return
+	}()
 	sql := `
 	UPDATE thread SET votes = votes + $1
 		WHERE id = $2
 	RETURNING author, created, forum, id, message, slug, title, votes;`
-	err = agr.Connection.QueryRow(sql, vote, id).Scan(&thread.Author, &thread.Created, &thread.Forum, &thread.Id, &thread.Message, &thread.Slug, &thread.Title, &thread.Votes)
+	err = tx.QueryRow(sql, vote, id).Scan(&thread.Author, &thread.Created, &thread.Forum, &thread.Id, &thread.Message, &thread.Slug, &thread.Title, &thread.Votes)
 	return
 }
