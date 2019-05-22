@@ -20,7 +20,7 @@ func (h *Handler) CreatePost(c *gin.Context) {
 	err := json.NewDecoder(c.Request.Body).Decode(&posts)
 	buf, _ := c.GetRawData()
 	created := strings.Contains(string(buf), "created")
-	fmt.Println(created)
+
 	slug_or_id := c.Param("slug_or_id")
 	id, err := strconv.Atoi(slug_or_id)
 	if err != nil {
@@ -96,8 +96,5 @@ func (h *Handler) CreatePost(c *gin.Context) {
 		return
 	}
 	err = h.Agregator.InsertUsersInForum(posts)
-	for _, p := range posts {
-		fmt.Println(p.Created)
-	}
 	c.JSON(201, posts)
 }

@@ -57,6 +57,5 @@ func (h *Handler) GetPostDetails(c *gin.Context) {
 		}
 		response.Thread = &t
 	}
-	fmt.Println(response.Post.Created)
 	c.JSON(200, response)
 }

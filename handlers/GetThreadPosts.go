@@ -62,9 +62,6 @@ func (h *Handler) GetThreadPosts(c *gin.Context) {
 		c.JSON(404, err)
 		return
 	}
-	//if len(posts) == 0 {
-	//	c.JSON(200, "[]")
-	//}
 
 	if len(posts) == 0 {
 		emptyArray := make([]int64, 0)
