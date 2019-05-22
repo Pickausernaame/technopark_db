@@ -8,12 +8,12 @@ func (agr *Agregator) CreateTableAgr() {
 
 	-- Уничтожаем существующие таблицы таблицы		
 	
-	DROP TABLE IF EXISTS users			CASCADE;
-	DROP TABLE IF EXISTS forum			CASCADE;
-	DROP TABLE IF EXISTS thread			CASCADE;
-	DROP TABLE IF EXISTS post				CASCADE;
-	DROP TABLE IF EXISTS vote				CASCADE;	
-	DROP TABLE IF EXISTS usersforum		CASCADE;
+--	DROP TABLE IF EXISTS users			CASCADE;
+--	DROP TABLE IF EXISTS forum			CASCADE;
+--	DROP TABLE IF EXISTS thread			CASCADE;
+--	DROP TABLE IF EXISTS post				CASCADE;
+--	DROP TABLE IF EXISTS vote				CASCADE;	
+--	DROP TABLE IF EXISTS usersforum		CASCADE;
 
 
 
@@ -74,7 +74,7 @@ func (agr *Agregator) CreateTableAgr() {
 
 	CREATE UNIQUE INDEX IF NOT EXISTS thread_slug_unique ON thread(slug) WHERE slug <> '';
 
-	--create unique index if not exists thread_unique on thread(slug, id);
+--	create unique index if not exists thread_unique on thread(slug, id);
 
 
 
@@ -97,8 +97,8 @@ create index if not exists "post_materialized_path_flat_sort" on post(thread_id,
 
 create index if not exists "post_materialized_path_tree_sort" on post (thread_id, path, id);
 
-create unique index if not exists "post_materialized_path_patent_tree_sort"
-on post (thread_id, substring(path from 1 for 6) desc, substring(path from 8) asc, id);
+--create unique index if not exists "post_materialized_path_patent_tree_sort"
+--on post (thread_id, substring(path from 1 for 6) desc, substring(path from 8) asc, id);
 
 create index if not exists "thread_created" on thread(forum, created);
 

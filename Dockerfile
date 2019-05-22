@@ -47,9 +47,9 @@ RUN printf "\n\
     wal_level            = 'minimal' \n\
     max_wal_senders      = '0'       \n\
     wal_writer_delay     = '2000ms'  \n\
-    shared_buffers       = '512MB'   \n\
+    shared_buffers       = '1024MB'   \n\
     effective_cache_size = '1024MB'  \n\
-    work_mem             = '16MB'    \n\
+    work_mem             = '32MB'    \n\
     log_min_messages     = 'panic'   \n" >> \
         "/etc/postgresql/10/main/postgresql.conf"
 
