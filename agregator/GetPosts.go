@@ -230,7 +230,6 @@ func (agr *Agregator) GetPostsParentTreeDESC(id int, lim int, since int) (outPos
 		p.ThreadId = id
 		err = rows.Scan(&p.Id, &p.Author, &p.Created, &p.IsEdited, &p.Message, &p.Path, &p.Parent, &p.Childrens, &p.Forum)
 		outPosts = append(outPosts, p)
-		fmt.Println(p.Path)
 	}
 	return
 }
