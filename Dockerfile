@@ -45,10 +45,11 @@ RUN printf "\n\
     full_page_writes     = 'off'     \n\
     autovacuum           = 'off'     \n\
     wal_level            = 'minimal' \n\
+    wal_buffers          = '1MB'     \n\
     max_wal_senders      = '0'       \n\
     wal_writer_delay     = '2000ms'  \n\
-    shared_buffers       = '1024MB'   \n\
-    effective_cache_size = '1024MB'  \n\
+    shared_buffers       = '256MB'   \n\
+    effective_cache_size = '512MB'  \n\
     work_mem             = '32MB'    \n\
     log_min_messages     = 'panic'   \n" >> \
         "/etc/postgresql/10/main/postgresql.conf"
