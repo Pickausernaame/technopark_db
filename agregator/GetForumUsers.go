@@ -8,12 +8,22 @@ import (
 
 func (agr *Agregator) GetUsersASC(slug string, lim int, since string) (users []models.User, err error) {
 	var rows *pgx.Rows
+
 	if since != "" {
+		//sql := `SELECT users.nickname, users.about, users.email, users.fullname FROM users
+		//		INNER JOIN usersforum ON usersforum.nickname = users.nickname
+		//		WHERE usersforum.forum = $1 AND usersforum.nickname > $2
+		//			ORDER BY usersforum.nickname ASC LIMIT $3;`
+
 		sql := `SELECT usersforum.nickname, users.about, users.email, users.fullname FROM usersforum, users
-				WHERE usersforum.forum = $1 AND usersforum.nickname > $2 AND usersforum.nickname = users.nickname 
+				WHERE usersforum.forum = $1 AND usersforum.nickname > $2 AND usersforum.nickname = users.nickname
 					ORDER BY usersforum.nickname ASC LIMIT $3;`
 		rows, err = agr.Connection.Query(sql, slug, since, lim)
 	} else {
+		//sql := `SELECT users.nickname, users.about, users.email, users.fullname FROM users
+		//		INNER JOIN usersforum ON usersforum.nickname = users.nickname
+		//		WHERE usersforum.forum = $1
+		//			ORDER BY usersforum.nickname ASC LIMIT $2;`
 		sql := `SELECT usersforum.nickname, users.about, users.email, users.fullname FROM usersforum, users
 				WHERE usersforum.forum = $1 AND usersforum.nickname = users.nickname
 					ORDER BY usersforum.nickname ASC LIMIT $2;`

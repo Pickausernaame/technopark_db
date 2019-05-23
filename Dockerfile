@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND 'noninteractive'
 RUN apt-get update -y
 RUN apt-get install -y --no-install-recommends apt-utils
 
-RUN apt-get install -y wget
+RUN apt-get install -y wget vim
 RUN apt-get install -y git
 
 RUN wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
@@ -21,10 +21,16 @@ ENV GOROOT /usr/local/go
 ENV GOPATH /opt/go
 ENV PATH $GOROOT/bin:$GOPATH/bin:/usr/local/go/bin:$PATH
 
-ENV POSTGRESQLVERSION 10
-RUN apt-get install -y postgresql-$POSTGRESQLVERSION
+ENV POSTGRESQLVERSION 11
+
+RUN apt-get update && apt-get install -y wget gnupg &&     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list
+
+RUN apt-get update && apt-get install -y postgresql-11
 
 WORKDIR /tech-db-forum
+
 COPY . .
 
 EXPOSE 5000
@@ -48,13 +54,15 @@ RUN printf "\n\
     wal_buffers          = '1MB'     \n\
     max_wal_senders      = '0'       \n\
     wal_writer_delay     = '2000ms'  \n\
-    shared_buffers       = '25MB'   \n\
+    shared_buffers       = '250MB'   \n\
     effective_cache_size = '1024MB'  \n\
     work_mem             = '2MB'    \n\
     log_min_messages     = 'panic'   \n" >> \
-        "/etc/postgresql/10/main/postgresql.conf"
+        "/etc/postgresql/11/main/postgresql.conf"
 
 EXPOSE 5432
+
+
 
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 

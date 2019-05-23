@@ -8,12 +8,12 @@ func (agr *Agregator) CreateTableAgr() {
 
 	-- Уничтожаем существующие таблицы таблицы		
 	
-	DROP TABLE IF EXISTS users			CASCADE;
-	DROP TABLE IF EXISTS forum			CASCADE;
-	DROP TABLE IF EXISTS thread			CASCADE;
-	DROP TABLE IF EXISTS post				CASCADE;
-	DROP TABLE IF EXISTS vote				CASCADE;	
-	DROP TABLE IF EXISTS usersforum		CASCADE;
+	--DROP TABLE IF EXISTS users			CASCADE;
+	--DROP TABLE IF EXISTS forum			CASCADE;
+	--DROP TABLE IF EXISTS thread			CASCADE;
+	--DROP TABLE IF EXISTS post				CASCADE;
+	--DROP TABLE IF EXISTS vote				CASCADE;	
+	--DROP TABLE IF EXISTS usersforum		CASCADE;
 
 
 
@@ -110,7 +110,7 @@ func (agr *Agregator) CreateTableAgr() {
 	CREATE TABLE IF NOT EXISTS usersforum (
 		forum				CITEXT							NOT NULL	REFERENCES	forum(slug),
   		nickname			CITEXT		COLLATE ucs_basic 	NOT NULL 	REFERENCES users(nickname),
-  		CONSTRAINT unique_users UNIQUE(forum, nickname) );
+  		CONSTRAINT unique_users UNIQUE(forum, nickname));
 
 
 

@@ -22,7 +22,8 @@ func (a *App) CreateRouter() (router *gin.Engine) {
 	a.Router.Use(gin.Logger())
 	a.Router.Use(gin.Recovery())
 	//a.Handler.Agregator.ClearTableAgr()
-	//a.Handler.Agregator.CreateTableAgr()
+
+	a.Handler.Agregator.CreateTableAgr()
 	a.Handler.Agregator.CreateIndexes()
 
 	// Создаем таблицы в бд
