@@ -1,7 +1,6 @@
 package agregator
 
 import (
-	"fmt"
 	"github.com/Pickausernaame/technopark_db/models"
 )
 
@@ -10,6 +9,5 @@ func (agr *Agregator) GetPost(id int) (post models.Post, err error) {
 				WHERE id = $1;`
 	err = agr.Connection.QueryRow(sql, id).Scan(&post.Author, &post.Forum, &post.ThreadId, &post.Created, &post.IsEdited, &post.Message, &post.Parent)
 	post.Id = id
-	fmt.Println(post.Created.Local())
 	return
 }
