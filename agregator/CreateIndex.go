@@ -15,9 +15,9 @@ DROP INDEX IF EXISTS thread_forum_index;
 
 CREATE INDEX IF NOT EXISTS flat_sort ON post(thread_id, id);
 
-CREATE INDEX IF NOT EXISTS tree_sort ON post(thread_id, path, id);
+--CREATE INDEX IF NOT EXISTS tree_sort ON post(thread_id, path, id);
 
-CREATE INDEX IF NOT EXISTS parent_tree_sort ON post (thread_id, substring(path from 1 for 6) desc, id);
+--CREATE INDEX IF NOT EXISTS parent_tree_sort ON post (thread_id, substring(path from 1 for 6) desc, id);
 
 CREATE INDEX IF NOT EXISTS thread_created ON thread(forum, created);
 

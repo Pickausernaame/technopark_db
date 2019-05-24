@@ -17,7 +17,7 @@ func main() {
 	}
 	confPool := pgx.ConnPoolConfig{
 		ConnConfig:     conf,
-		MaxConnections: 16,
+		MaxConnections: 8,
 	}
 
 	a := application.CreateApp(&confPool)
