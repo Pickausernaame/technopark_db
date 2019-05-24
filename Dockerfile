@@ -11,7 +11,6 @@ ENV DEBIAN_FRONTEND 'noninteractive'
 RUN apt-get update -y
 RUN apt-get install -y --no-install-recommends apt-utils
 
-RUN apt-get install -y wgetdocker system prune --volumes
 RUN apt-get install -y git
 
 RUN wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
