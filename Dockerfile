@@ -47,14 +47,13 @@ USER root
 RUN printf "\n\
     fsync                = 'off'     \n\
     synchronous_commit   = 'off'     \n\
-    full_page_writes     = 'off'     \n\
     autovacuum           = 'off'     \n\
     wal_level            = 'minimal' \n\
-    wal_buffers          = '1MB'     \n\
+    wal_buffers          = '16MB'     \n\
     max_wal_senders      = '0'       \n\
     wal_writer_delay     = '2000ms'  \n\
     shared_buffers       = '512MB'   \n\
-    effective_cache_size = '1024MB'  \n\
+    effective_cache_size = '512MB'  \n\
     log_min_messages     = 'panic'   \n" >> \
         "/etc/postgresql/11/main/postgresql.conf"
 
