@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND 'noninteractive'
 RUN apt-get update -y
 RUN apt-get install -y --no-install-recommends apt-utils
 
-RUN apt-get install -y git
+RUN apt-get install -y git wget
 
 RUN wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
 RUN tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz
