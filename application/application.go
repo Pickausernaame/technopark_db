@@ -49,7 +49,7 @@ func (a *App) CreateRouter() (router *gin.Engine) {
 
 		api.POST("/post/:id/details", a.Handler.UpdatePost)
 
-		api.POST("/service/clear", a.Handler.CreateTables)
+		api.POST("/service/clear", a.Handler.ClearTables)
 
 		api.GET("/service/status", a.Handler.ServiceStatus)
 		// Создание поста
