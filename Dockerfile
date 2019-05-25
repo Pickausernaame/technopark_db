@@ -47,14 +47,27 @@ USER root
 RUN printf "\n\
     fsync                = 'off'     \n\
     synchronous_commit   = 'off'     \n\
+    huge_pages           = 'off'     \n\
     autovacuum           = 'off'     \n\
+    logging_collector    = 'off'     \n\
+    max_worker_processes = '8'        \n\
+    max_parallel_workers = '8'       \n\
+    parallel_leader_participation  = 'on'   \n\
     wal_level            = 'minimal' \n\
     wal_buffers          = '16MB'     \n\
+    wal_compression      = 'on'        \n\
+    wal_keep_segments    = '130'     \n\
     max_wal_senders      = '0'       \n\
     wal_writer_delay     = '2000ms'  \n\
-    shared_buffers       = '512MB'   \n\
-    effective_cache_size = '512MB'  \n\
-    log_min_messages     = 'panic'   \n" >> \
+    shared_buffers       = '256 MB'   \n\
+    effective_cache_size = '1024 MB'  \n\
+    work_mem = '32 MB'              \n\
+    maintenance_work_mem = '360 MB' \n\
+    log_min_messages     = 'panic'   \n\
+    bgwriter_delay = '210ms'    \n\
+    max_wal_senders = '0' \n\
+    jit = 'on'\n\
+    " >> \
         "/etc/postgresql/11/main/postgresql.conf"
 
 EXPOSE 5432
