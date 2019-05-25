@@ -10,7 +10,7 @@ import (
 
 func (h *Handler) EditUser(c *gin.Context) {
 
-	var editUser models.User
+	editUser := &models.User{}
 	_ = json.NewDecoder(c.Request.Body).Decode(&editUser)
 	nickname := c.Param("nickname")
 	curUser, err := h.Agregator.EditUserAgr(nickname, editUser)

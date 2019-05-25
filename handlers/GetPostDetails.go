@@ -19,7 +19,7 @@ func (h *Handler) GetPostDetails(c *gin.Context) {
 	needForum := strings.Contains(related, "forum")
 	needThread := strings.Contains(related, "thread")
 
-	var response models.PostDetails
+	response := &models.PostDetails{}
 
 	p, err := h.Agregator.GetPost(id)
 	if err != nil {
@@ -28,7 +28,7 @@ func (h *Handler) GetPostDetails(c *gin.Context) {
 		return
 	}
 
-	response.Post = &p
+	response.Post = p
 
 	if needUser {
 		u, err := h.Agregator.GetUserAgr(p.Author)
@@ -37,7 +37,7 @@ func (h *Handler) GetPostDetails(c *gin.Context) {
 			c.JSON(404, err)
 			return
 		}
-		response.Author = &u
+		response.Author = u
 	}
 	if needForum {
 		f, err := h.Agregator.GetForumAgr(p.Forum)
@@ -46,7 +46,7 @@ func (h *Handler) GetPostDetails(c *gin.Context) {
 			c.JSON(404, err)
 			return
 		}
-		response.Forum = &f
+		response.Forum = f
 	}
 	if needThread {
 		t, err := h.Agregator.GetThreadById(p.ThreadId)
@@ -55,7 +55,7 @@ func (h *Handler) GetPostDetails(c *gin.Context) {
 			c.JSON(404, err)
 			return
 		}
-		response.Thread = &t
+		response.Thread = t
 	}
 	c.JSON(200, response)
 }

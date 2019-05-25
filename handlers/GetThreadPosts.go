@@ -9,7 +9,7 @@ import (
 func (h *Handler) GetThreadPosts(c *gin.Context) {
 	slug_or_id := c.Param("slug_or_id")
 	id, err := strconv.Atoi(slug_or_id)
-	var thread models.Thread
+	thread := &models.Thread{}
 	if err != nil {
 		thread, err = h.Agregator.GetThreadAgr(slug_or_id)
 		if err != nil {
@@ -35,7 +35,7 @@ func (h *Handler) GetThreadPosts(c *gin.Context) {
 	}
 	desc, _ := strconv.ParseBool(c.Query("desc"))
 	err = nil
-	var posts []models.Post
+	posts := &models.Posts{}
 	switch c.Query("sort") {
 	case "":
 		fallthrough
@@ -63,7 +63,7 @@ func (h *Handler) GetThreadPosts(c *gin.Context) {
 		return
 	}
 
-	if len(posts) == 0 {
+	if len(*posts) == 0 {
 		emptyArray := make([]int64, 0)
 		c.JSON(200, emptyArray)
 		return

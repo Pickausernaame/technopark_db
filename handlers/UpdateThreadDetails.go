@@ -17,7 +17,7 @@ func (h *Handler) UpdateThreadDetails(c *gin.Context) {
 	}
 	slug_or_id := c.Param("slug_or_id")
 	id, err := strconv.Atoi(slug_or_id)
-	var response models.Thread
+	response := &models.Thread{}
 	if err != nil {
 		response, err = h.Agregator.GetThreadAgr(slug_or_id)
 		if err != nil {
@@ -46,7 +46,7 @@ func (h *Handler) UpdateThreadDetails(c *gin.Context) {
 	update.Id = response.Id
 	response.Message = update.Message
 	response.Title = update.Title
-	err = h.Agregator.ThreadUpdate(update)
+	err = h.Agregator.ThreadUpdate(&update)
 	if err != nil {
 		c.JSON(404, err)
 		return

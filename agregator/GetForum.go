@@ -5,10 +5,10 @@ import (
 	"github.com/Pickausernaame/technopark_db/models"
 )
 
-func (agr *Agregator) GetForumAgr(slug string) (outForum models.Forum, err error) {
+func (agr *Agregator) GetForumAgr(slug string) (outForum *models.Forum, err error) {
 	sql := `SELECT slug, title, nickname, posts, threads FROM forum
 				WHERE forum.slug = $1;`
-
+	outForum = &models.Forum{}
 	err = agr.Connection.QueryRow(sql, slug).Scan(&outForum.Slug, &outForum.Title, &outForum.User, &outForum.Posts, &outForum.Threads)
 	fmt.Println(err)
 	return

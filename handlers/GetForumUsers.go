@@ -27,7 +27,7 @@ func (h *Handler) GetForumUsers(c *gin.Context) {
 		c.JSON(404, err)
 		return
 	}
-	var users []models.User
+	users := &[]models.User{}
 
 	if desc {
 		users, err = h.Agregator.GetUsersDESC(slug, lim, since)
@@ -39,7 +39,7 @@ func (h *Handler) GetForumUsers(c *gin.Context) {
 		return
 	}
 
-	if len(users) == 0 {
+	if len(*users) == 0 {
 		emptyArray := make([]int64, 0)
 		c.JSON(200, emptyArray)
 		return

@@ -13,7 +13,7 @@ func NodeSetter(numb int) string {
 	return strings.Repeat("0", 6-len(path)) + path
 }
 
-func (agr *Agregator) GetPostsFlatASC(id int, lim int, since int) (outPosts []models.Post, err error) {
+func (agr *Agregator) GetPostsFlatASC(id int, lim int, since int) (outPosts *models.Posts, err error) {
 	var sql string
 	var rows *pgx.Rows
 	if since < 0 {
@@ -35,18 +35,20 @@ func (agr *Agregator) GetPostsFlatASC(id int, lim int, since int) (outPosts []mo
 		return
 	}
 	defer rows.Close()
+	outPosts = &models.Posts{}
 	for rows.Next() {
 		var p models.Post
 
 		err = rows.Scan(&p.Id, &p.Author, &p.Created, &p.IsEdited, &p.Message, &p.Path, &p.Parent, &p.Childrens, &p.Forum)
 		p.ThreadId = id
-		outPosts = append(outPosts, p)
+		*outPosts = append(*outPosts, p)
 	}
 	return
 }
 
-func (agr *Agregator) GetPostsFlatDESC(id int, lim int, since int) (outPosts []models.Post, err error) {
+func (agr *Agregator) GetPostsFlatDESC(id int, lim int, since int) (outPosts *models.Posts, err error) {
 	var sql string
+	outPosts = &models.Posts{}
 	var rows *pgx.Rows
 	if since < 0 {
 		sql = `
@@ -69,13 +71,14 @@ func (agr *Agregator) GetPostsFlatDESC(id int, lim int, since int) (outPosts []m
 		var p models.Post
 		err = rows.Scan(&p.Id, &p.Author, &p.Created, &p.IsEdited, &p.Message, &p.Path, &p.Parent, &p.Childrens, &p.Forum)
 		p.ThreadId = id
-		outPosts = append(outPosts, p)
+		*outPosts = append(*outPosts, p)
 	}
 	return
 }
 
-func (agr *Agregator) GetPostsTreeASC(id int, lim int, since int) (outPosts []models.Post, err error) {
+func (agr *Agregator) GetPostsTreeASC(id int, lim int, since int) (outPosts *models.Posts, err error) {
 	var sql string
+	outPosts = &models.Posts{}
 	var rows *pgx.Rows
 	if since < 0 {
 		sql = `
@@ -97,13 +100,14 @@ func (agr *Agregator) GetPostsTreeASC(id int, lim int, since int) (outPosts []mo
 		var p models.Post
 		p.ThreadId = id
 		err = rows.Scan(&p.Id, &p.Author, &p.Created, &p.IsEdited, &p.Message, &p.Path, &p.Parent, &p.Childrens, &p.Forum)
-		outPosts = append(outPosts, p)
+		*outPosts = append(*outPosts, p)
 	}
 	return
 }
 
-func (agr *Agregator) GetPostsTreeDESC(id int, lim int, since int) (outPosts []models.Post, err error) {
+func (agr *Agregator) GetPostsTreeDESC(id int, lim int, since int) (outPosts *models.Posts, err error) {
 	var sql string
+	outPosts = &models.Posts{}
 	var rows *pgx.Rows
 	if since < 0 {
 		sql = `
@@ -126,13 +130,14 @@ func (agr *Agregator) GetPostsTreeDESC(id int, lim int, since int) (outPosts []m
 		var p models.Post
 		p.ThreadId = id
 		err = rows.Scan(&p.Id, &p.Author, &p.Created, &p.IsEdited, &p.Message, &p.Path, &p.Parent, &p.Childrens, &p.Forum)
-		outPosts = append(outPosts, p)
+		*outPosts = append(*outPosts, p)
 	}
 	return
 }
 
-func (agr *Agregator) GetPostsParentTreeASC(id int, lim int, since int) (outPosts []models.Post, err error) {
+func (agr *Agregator) GetPostsParentTreeASC(id int, lim int, since int) (outPosts *models.Posts, err error) {
 	var sql string
+	outPosts = &models.Posts{}
 	var rows *pgx.Rows
 	if since < 0 {
 		sql = `
@@ -167,12 +172,13 @@ func (agr *Agregator) GetPostsParentTreeASC(id int, lim int, since int) (outPost
 		var p models.Post
 		p.ThreadId = id
 		err = rows.Scan(&p.Id, &p.Author, &p.Created, &p.IsEdited, &p.Message, &p.Path, &p.Parent, &p.Childrens, &p.Forum)
-		outPosts = append(outPosts, p)
+		*outPosts = append(*outPosts, p)
 	}
 	return
 }
 
-func (agr *Agregator) GetPostsParentTreeDESC(id int, lim int, since int) (outPosts []models.Post, err error) {
+func (agr *Agregator) GetPostsParentTreeDESC(id int, lim int, since int) (outPosts *models.Posts, err error) {
+	outPosts = &models.Posts{}
 	sql := `WITH bounds AS (SELECT
   					SUBSTRING($2 FROM 1 FOR 6	) AS from_prefix,
 					SUBSTRING($2 FROM 8			) AS from_postfix,
@@ -229,7 +235,7 @@ func (agr *Agregator) GetPostsParentTreeDESC(id int, lim int, since int) (outPos
 		var p models.Post
 		p.ThreadId = id
 		err = rows.Scan(&p.Id, &p.Author, &p.Created, &p.IsEdited, &p.Message, &p.Path, &p.Parent, &p.Childrens, &p.Forum)
-		outPosts = append(outPosts, p)
+		*outPosts = append(*outPosts, p)
 	}
 	return
 }

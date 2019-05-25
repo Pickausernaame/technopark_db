@@ -3,11 +3,95 @@ package agregator
 import (
 	"fmt"
 	"github.com/Pickausernaame/technopark_db/models"
+	"github.com/jackc/pgx"
 	"strconv"
 	"strings"
 )
 
-func (agr *Agregator) CreatePostByIdAgr(Posts []models.Post, id int, created bool) (outPosts []models.Post, err error) {
+func generateBody(len int, argc int) (body string) {
+	format := "("
+	for i := 0; i < argc-1; i++ {
+		format += "$%d,"
+	}
+	format += "$%d)"
+	for i := 0; i < len; i++ {
+		var argv []interface{}
+		for j := 0; j < argc; j++ {
+			num := i*argc + j + 1
+			argv = append(argv, num)
+		}
+		part := fmt.Sprintf(format, argv...)
+		if i < len-1 {
+			part += ","
+		}
+		body += part
+
+	}
+	return body
+}
+
+func (agr *Agregator) InsertWithCreated(posts *models.Posts, thread *models.Thread, tx *pgx.Tx) (outPosts *models.Posts, err error) {
+	const argc = 7
+	sql := "INSERT INTO post (author, forum, thread_id, is_edited, message, parent, created) VALUES " + generateBody(len(*posts), argc) + "RETURNING id;"
+	var argv []interface{}
+	outPosts = &models.Posts{}
+	for _, p := range *posts {
+		p.Forum = thread.Forum
+		p.ThreadId = thread.Id
+		p.Thread = thread.Slug
+		argv = append(argv, p.Author, p.Forum, p.ThreadId, p.IsEdited, p.Message, p.Parent, p.Created)
+		*outPosts = append(*outPosts, p)
+	}
+	rows, err := tx.Query(sql, argv...)
+	if err != nil {
+		fmt.Println("Ошибка создания поста по slug")
+		return nil, err
+	}
+	ind := -1
+	for rows.Next() {
+		ind++
+		err = rows.Scan(&(*outPosts)[ind].Id)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return
+}
+
+func (agr *Agregator) InsertWithoutCreated(posts *models.Posts, thread *models.Thread, tx *pgx.Tx) (outPosts *models.Posts, err error) {
+	const argc = 6
+	fmt.Println(generateBody(len(*posts), argc))
+	sql := "INSERT INTO post (author, forum, thread_id, is_edited, message, parent) VALUES " + generateBody(len(*posts), argc) + "RETURNING id, created;"
+	var argv []interface{}
+	outPosts = &models.Posts{}
+	for _, p := range *posts {
+		p.Forum = thread.Forum
+		p.ThreadId = thread.Id
+		p.Thread = thread.Slug
+		argv = append(argv, p.Author, p.Forum, p.ThreadId, p.IsEdited, p.Message, p.Parent)
+
+		*outPosts = append(*outPosts, p)
+	}
+
+	rows, err := tx.Query(sql, argv...)
+	if err != nil {
+		fmt.Println("Ошибка создания поста по slug")
+		fmt.Println(err)
+		return nil, err
+	}
+	ind := -1
+
+	for rows.Next() {
+		ind++
+		err := rows.Scan(&(*outPosts)[ind].Id, &(*outPosts)[ind].Created)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return
+}
+
+func (agr *Agregator) CreatePostByIdAgr(posts *models.Posts, id int, created bool) (outPosts *models.Posts, err error) {
 	tx, err := agr.Connection.Begin()
 	defer func() {
 		if err != nil {
@@ -23,44 +107,21 @@ func (agr *Agregator) CreatePostByIdAgr(Posts []models.Post, id int, created boo
 		return nil, err
 	}
 
-	sql := ``
 	if created {
-		sql = `INSERT INTO post (author, forum, thread_id, is_edited, message, parent, created)
-					VALUES ($1, $2, $3, $4, $5, $6, $7)
-					RETURNING id;`
-		for _, p := range Posts {
-			p.Forum = thread.Forum
-			p.ThreadId = thread.Id
-			p.Thread = thread.Slug
-			err = tx.QueryRow(sql, p.Author, p.Forum, p.ThreadId, p.IsEdited, p.Message, p.Parent, p.Created).Scan(&p.Id)
-			if err != nil {
-				fmt.Println("Ошибка создания поста по slug")
-				fmt.Println(err)
-				return nil, err
-			}
-			outPosts = append(outPosts, p)
+		outPosts, err = agr.InsertWithCreated(posts, thread, tx)
+		if err != nil {
+			return nil, err
 		}
 	} else {
-		sql = `INSERT INTO post (author, forum, thread_id, is_edited, message, parent)
-					VALUES ($1, $2, $3, $4, $5, $6)
-					RETURNING id, created;`
-		for _, p := range Posts {
-			p.Forum = thread.Forum
-			p.ThreadId = thread.Id
-			p.Thread = thread.Slug
-			err = tx.QueryRow(sql, p.Author, p.Forum, p.ThreadId, p.IsEdited, p.Message, p.Parent).Scan(&p.Id, &p.Created)
-			if err != nil {
-				fmt.Println("Ошибка создания поста по slug")
-				fmt.Println(err)
-				return nil, err
-			}
-			outPosts = append(outPosts, p)
+		outPosts, err = agr.InsertWithoutCreated(posts, thread, tx)
+		if err != nil {
+			return nil, err
 		}
 	}
 	return
 }
 
-func (agr *Agregator) CreatePostBySlugAgr(Posts []models.Post, slug string, created bool) (outPosts []models.Post, err error) {
+func (agr *Agregator) CreatePostBySlugAgr(posts *models.Posts, slug string, created bool) (outPosts *models.Posts, err error) {
 	tx, err := agr.Connection.Begin()
 	defer func() {
 		if err != nil {
@@ -73,41 +134,17 @@ func (agr *Agregator) CreatePostBySlugAgr(Posts []models.Post, slug string, crea
 	thread, err := agr.GetThreadAgr(slug)
 	if err != nil {
 		fmt.Println("Ошибка чиения треда по slug")
-		fmt.Println(err)
 		return nil, err
 	}
-	sql := ``
 	if created {
-		sql = `INSERT INTO post (author, forum, thread_id, is_edited, message, parent, created)
-					VALUES ($1, $2, $3, $4, $5, $6, $7)
-					RETURNING id;`
-		for _, p := range Posts {
-			p.Forum = thread.Forum
-			p.ThreadId = thread.Id
-			p.Thread = thread.Slug
-			err = tx.QueryRow(sql, p.Author, p.Forum, p.ThreadId, p.IsEdited, p.Message, p.Parent, p.Created).Scan(&p.Id)
-			if err != nil {
-				fmt.Println("Ошибка создания поста по slug")
-				fmt.Println(err)
-				return nil, err
-			}
-			outPosts = append(outPosts, p)
+		outPosts, err = agr.InsertWithCreated(posts, thread, tx)
+		if err != nil {
+			return nil, err
 		}
 	} else {
-		sql = `INSERT INTO post (author, forum, thread_id, is_edited, message, parent)
-					VALUES ($1, $2, $3, $4, $5, $6)
-					RETURNING id, created;`
-		for _, p := range Posts {
-			p.Forum = thread.Forum
-			p.ThreadId = thread.Id
-			p.Thread = thread.Slug
-			err = tx.QueryRow(sql, p.Author, p.Forum, p.ThreadId, p.IsEdited, p.Message, p.Parent).Scan(&p.Id, &p.Created)
-			if err != nil {
-				fmt.Println("Ошибка создания поста по slug")
-				fmt.Println(err)
-				return nil, err
-			}
-			outPosts = append(outPosts, p)
+		outPosts, err = agr.InsertWithoutCreated(posts, thread, tx)
+		if err != nil {
+			return nil, err
 		}
 	}
 	return
@@ -159,7 +196,7 @@ func (agr *Agregator) GetPostConnections(parents []int) (postConnections PostCon
 	return postConnections, nil
 }
 
-func (agr *Agregator) PostChildrenUpdate(pc PostConnections) (err error) {
+func (agr *Agregator) PostChildrenUpdate(pc *PostConnections) (err error) {
 	tx, err := agr.Connection.Begin()
 	defer func() {
 		if err != nil {
@@ -170,13 +207,13 @@ func (agr *Agregator) PostChildrenUpdate(pc PostConnections) (err error) {
 		return
 	}()
 	sql := "UPDATE post set children = $2 WHERE id = $1;"
-	for k, v := range pc {
+	for k, v := range *pc {
 		_, err = tx.Exec(sql, k, v.NumberOfChildren)
 	}
 	return
 }
 
-func (agr *Agregator) PostsCreateInsert(posts []models.Post, roots int) (err error) {
+func (agr *Agregator) PostsCreateInsert(posts *models.Posts, roots int) (err error) {
 
 	tx, err := agr.Connection.Begin()
 
@@ -193,7 +230,7 @@ func (agr *Agregator) PostsCreateInsert(posts []models.Post, roots int) (err err
 		sql := ` 
 	UPDATE thread SET roots = $1
 		WHERE id = $2;`
-		_, err = tx.Exec(sql, roots, posts[0].ThreadId)
+		_, err = tx.Exec(sql, roots, (*posts)[0].ThreadId)
 		if err != nil {
 			fmt.Println("Ошибка обновления корней")
 			fmt.Println(err)
@@ -201,8 +238,7 @@ func (agr *Agregator) PostsCreateInsert(posts []models.Post, roots int) (err err
 		}
 	}
 
-	for _, p := range posts {
-
+	for _, p := range *posts {
 		sql := `
 			UPDATE post SET 
 				path = $2, children = $3
@@ -212,14 +248,12 @@ func (agr *Agregator) PostsCreateInsert(posts []models.Post, roots int) (err err
 			fmt.Println("Ошибка обновления детей")
 			return err
 		}
-
 	}
 	return
 }
 
-func (agr *Agregator) InsertUsersInForum(posts []models.Post) (err error) {
+func (agr *Agregator) InsertUsersInForum(posts *models.Posts) (err error) {
 	tx, err := agr.Connection.Begin()
-
 	defer func() {
 		if err != nil {
 			_ = tx.Rollback()
@@ -229,7 +263,7 @@ func (agr *Agregator) InsertUsersInForum(posts []models.Post) (err error) {
 		return
 	}()
 
-	for _, p := range posts {
+	for _, p := range *posts {
 		ssql := `INSERT INTO usersforum (nickname, forum) VALUES ($1, $2)
 					ON CONFLICT DO NOTHING;`
 		_, err = tx.Exec(ssql, p.Author, p.Forum)

@@ -5,7 +5,7 @@ import (
 	"github.com/Pickausernaame/technopark_db/models"
 )
 
-func (agr *Agregator) CreateUserAgr(newUser models.User) (err error) {
+func (agr *Agregator) CreateUserAgr(newUser *models.User) (err error) {
 	sql := `INSERT INTO users (nickname, fullname, about, email)
 				VALUES($1, $2, $3, $4);`
 	tx, err := agr.Connection.Begin()
@@ -28,17 +28,18 @@ func (agr *Agregator) CreateUserAgr(newUser models.User) (err error) {
 	return
 }
 
-func (agr *Agregator) ErrorCreateUserArg(nickname string, email string) (resUsers []models.User, err error) {
+func (agr *Agregator) ErrorCreateUserArg(nickname string, email string) (resUsers *[]models.User, err error) {
 	sql := `SELECT nickname, fullname, about, email FROM users
 				WHERE nickname = $1 OR email = $2;`
 	rows, err := agr.Connection.Query(sql, nickname, email)
 	fmt.Println(err)
 	defer rows.Close()
+	resUsers = &[]models.User{}
 	for rows.Next() {
 		var currentUser models.User
 		err = rows.Scan(&currentUser.Nickname, &currentUser.Fullname, &currentUser.About, &currentUser.Email)
 		fmt.Println(err)
-		resUsers = append(resUsers, currentUser)
+		*resUsers = append(*resUsers, currentUser)
 	}
 
 	return

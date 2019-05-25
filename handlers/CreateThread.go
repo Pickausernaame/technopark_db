@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateThread(c *gin.Context) {
-	var thread models.Thread
+	var thread *models.Thread
 	_ = json.NewDecoder(c.Request.Body).Decode(&thread)
 	thread.Forum = c.Param("slug")
 	resThread, err := h.Agregator.CreateThreadAgr(thread)

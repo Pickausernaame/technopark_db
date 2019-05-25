@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateUser(c *gin.Context) {
-	var newUser models.User
+	newUser := &models.User{}
 	err := json.NewDecoder(c.Request.Body).Decode(&newUser)
 	if err != nil {
 		fmt.Println("Error in CreateUser handler 3")

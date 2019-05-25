@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-func (agr *Agregator) GetThreadsAgr(slug string, limit int, since time.Time, desk bool) (Threads []models.Thread, err error, exist bool) {
+func (agr *Agregator) GetThreadsAgr(slug string, limit int, since time.Time, desk bool) (threads *[]models.Thread, err error, exist bool) {
 	sql := `SELECT EXISTS (SELECT true FROM forum WHERE slug = $1);`
 	//sql := `SELECT * FROM forum WHERE slug = $1;`
 	err = agr.Connection.QueryRow(sql, slug).Scan(&exist)
 	if !exist {
-		return
+		return nil, err, false
 	}
 	if desk {
 		sql = `
@@ -25,11 +25,14 @@ func (agr *Agregator) GetThreadsAgr(slug string, limit int, since time.Time, des
 					ORDER BY created ASC LIMIT $2;`
 	}
 	rows, err := agr.Connection.Query(sql, slug, limit, since)
-
+	if err != nil {
+		return nil, err, false
+	}
+	threads = &[]models.Thread{}
 	for rows.Next() {
 		var thread models.Thread
 		err = rows.Scan(&thread.Author, &thread.Created, &thread.Forum, &thread.Id, &thread.Message, &thread.Slug, &thread.Title, &thread.Votes)
-		Threads = append(Threads, thread)
+		*threads = append(*threads, thread)
 		if err != nil {
 			fmt.Println(err)
 		}

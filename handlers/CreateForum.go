@@ -22,12 +22,11 @@ func (h *Handler) CreateForum(c *gin.Context) {
 		return
 	}
 	var newForum models.Forum
-	var resForum models.Forum
 	err := json.NewDecoder(c.Request.Body).Decode(&newForum)
 	if err != nil {
 		c.JSON(409, BadUnmarshal)
 	}
-	resForum, err = h.Agregator.CreateForumAgr(&newForum)
+	resForum, err := h.Agregator.CreateForumAgr(&newForum)
 	if err != nil {
 		// такой форум есть
 		if err.(pgx.PgError).Code == "23505" {

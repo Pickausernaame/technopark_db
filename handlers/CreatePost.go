@@ -16,16 +16,30 @@ func NodeSetter(numb int) string {
 }
 
 func (h *Handler) CreatePost(c *gin.Context) {
-	var posts models.Posts
+	var posts *models.Posts
 	err := json.NewDecoder(c.Request.Body).Decode(&posts)
 	buf, _ := c.GetRawData()
 	created := strings.Contains(string(buf), "created")
-
 	slug_or_id := c.Param("slug_or_id")
 	id, err := strconv.Atoi(slug_or_id)
+
 	if err != nil {
-		thread, _ := h.Agregator.GetThreadAgr(slug_or_id)
-		for _, p := range posts {
+		exist, err := h.Agregator.IsThreadExistBySlug(slug_or_id)
+		if !exist || err != nil {
+			c.JSON(404, err)
+			return
+		}
+		if len(*posts) == 0 {
+			emptyArray := make([]int64, 0)
+			c.JSON(201, emptyArray)
+			return
+		}
+		thread, err := h.Agregator.GetThreadAgr(slug_or_id)
+		if err != nil {
+			c.JSON(404, err)
+			return
+		}
+		for _, p := range *posts {
 			p.ThreadId = thread.Id
 			p.Forum = thread.Forum
 		}
@@ -35,6 +49,16 @@ func (h *Handler) CreatePost(c *gin.Context) {
 			return
 		}
 	} else {
+		exist, err := h.Agregator.IsThreadExistById(id)
+		if !exist || err != nil {
+			c.JSON(404, err)
+			return
+		}
+		if len(*posts) == 0 {
+			emptyArray := make([]int64, 0)
+			c.JSON(201, emptyArray)
+			return
+		}
 		posts, err = h.Agregator.CreatePostByIdAgr(posts, id, created)
 		if err != nil {
 			c.JSON(404, err)
@@ -42,16 +66,11 @@ func (h *Handler) CreatePost(c *gin.Context) {
 		}
 	}
 
-	if len(posts) == 0 {
-		emptyArray := make([]int64, 0)
-		c.JSON(201, emptyArray)
-		return
-	}
 	var postsConnections agregator.PostConnections
-	parentIds := make([]int, len(posts))
-	for i := range posts {
-		if posts[i].Parent != 0 {
-			parentIds = append(parentIds, posts[i].Parent)
+	parentIds := make([]int, len(*posts))
+	for i := range *posts {
+		if (*posts)[i].Parent != 0 {
+			parentIds = append(parentIds, (*posts)[i].Parent)
 		}
 
 	}
@@ -62,27 +81,27 @@ func (h *Handler) CreatePost(c *gin.Context) {
 		return
 	}
 
-	NumberOfRoots, err := h.Agregator.GetRoots(posts[0].ThreadId)
-	for i := range posts {
-		if posts[i].Parent == 0 {
+	NumberOfRoots, err := h.Agregator.GetRoots((*posts)[0].ThreadId)
+	for i := range *posts {
+		if (*posts)[i].Parent == 0 {
 			NumberOfRoots++
-			posts[i].Path = NodeSetter(NumberOfRoots)
+			(*posts)[i].Path = NodeSetter(NumberOfRoots)
 		} else {
-			parentId := posts[i].Parent
+			parentId := (*posts)[i].Parent
 
 			parentPostConnection := postsConnections[parentId]
 
-			if parentPostConnection.ThreadId != posts[i].ThreadId {
+			if parentPostConnection.ThreadId != (*posts)[i].ThreadId {
 				c.JSON(409, models.Thread{})
 				return
 			}
 			parentPostConnection.NumberOfChildren++
-			posts[i].Path = parentPostConnection.MaterializedPath + "." + NodeSetter(parentPostConnection.NumberOfChildren)
+			(*posts)[i].Path = parentPostConnection.MaterializedPath + "." + NodeSetter(parentPostConnection.NumberOfChildren)
 			postsConnections[parentId] = parentPostConnection
 		}
 	}
 
-	err = h.Agregator.PostChildrenUpdate(postsConnections)
+	err = h.Agregator.PostChildrenUpdate(&postsConnections)
 	if err != nil {
 		c.JSON(404, err)
 		return

@@ -23,7 +23,7 @@ func (h *Handler) SetThreadVote(c *gin.Context) {
 	}
 	vote.Id = id
 	oldVote, err := h.Agregator.GetVote(vote.Nickname, id)
-	var thread models.Thread
+	thread := &models.Thread{}
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			err = h.Agregator.InsertVote(vote)

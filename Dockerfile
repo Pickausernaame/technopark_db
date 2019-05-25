@@ -20,8 +20,6 @@ ENV GOROOT /usr/local/go
 ENV GOPATH /opt/go
 ENV PATH $GOROOT/bin:$GOPATH/bin:/usr/local/go/bin:$PATH
 
-ENV POSTGRESQLVERSION 11
-
 RUN apt-get update && apt-get install -y wget gnupg &&     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list
@@ -58,14 +56,21 @@ RUN printf "\n\
     jit                             = 'on'              \n\
     max_worker_processes            = '8'               \n\
     max_parallel_workers            = '8'               \n\
+    max_parallel_workers_per_gather = 4                 \n\
+    max_parallel_maintenance_workers = 4                \n\
+    checkpoint_completion_target    = '0.9'             \n\
     max_wal_senders                 = '0'               \n\
     max_wal_senders                 = '0'               \n\
     effective_io_concurrency        = '0'               \n\
+    bgwriter_lru_maxpages           = '100'             \n\
+    bgwriter_lru_multiplier         = '2.0'             \n\
+    bgwriter_flush_after            = '0'               \n\
     wal_keep_segments               = '130'             \n\
     wal_level                       = 'minimal'         \n\
     log_min_messages                = 'panic'           \n\
     wal_writer_delay                = '2000ms'          \n\
     bgwriter_delay                  = '210ms'           \n\
+    checkpoint_timeout              = '15 min'          \n\
     wal_buffers                     = '16MB'            \n\
     shared_buffers                  = '256 MB'          \n\
     effective_cache_size            = '1024 MB'         \n\

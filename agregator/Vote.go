@@ -58,7 +58,7 @@ func (agr *Agregator) InsertVote(vote models.Vote) (err error) {
 	return
 }
 
-func (agr *Agregator) UpdateThreadVote(vote int, id int) (thread models.Thread, err error) {
+func (agr *Agregator) UpdateThreadVote(vote int, id int) (thread *models.Thread, err error) {
 	tx, err := agr.Connection.Begin()
 	defer func() {
 		if err != nil {
@@ -72,6 +72,7 @@ func (agr *Agregator) UpdateThreadVote(vote int, id int) (thread models.Thread, 
 	UPDATE thread SET votes = votes + $1
 		WHERE id = $2
 	RETURNING author, created, forum, id, message, slug, title, votes;`
+	thread = &models.Thread{}
 	err = tx.QueryRow(sql, vote, id).Scan(&thread.Author, &thread.Created, &thread.Forum, &thread.Id, &thread.Message, &thread.Slug, &thread.Title, &thread.Votes)
 	return
 }
