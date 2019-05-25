@@ -55,6 +55,7 @@ RUN printf "\n\
     row_security                    = 'off'             \n\
     parallel_leader_participation   = 'on'              \n\
     wal_compression                 = 'on'              \n\
+    jit                             = 'on'              \n\
     max_worker_processes            = '8'               \n\
     max_parallel_workers            = '8'               \n\
     max_wal_senders                 = '0'               \n\
@@ -74,7 +75,7 @@ RUN printf "\n\
         "/etc/postgresql/11/main/postgresql.conf"
 
 
-#jit                             = 'on'              \n\
+
 
 
 EXPOSE 5432

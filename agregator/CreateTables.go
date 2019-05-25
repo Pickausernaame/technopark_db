@@ -53,7 +53,7 @@ func (agr *Agregator) CreateTableAgr() {
 		threads			INTEGER							DEFAULT 0 );
 
 
---CREATE UNIQUE INDEX IF NOT EXISTS forum_unique on forum(slug);
+	CREATE UNIQUE INDEX IF NOT EXISTS forum_unique on forum(slug);
 
 
 
