@@ -78,6 +78,16 @@ go build github.com/bozaro/tech-db-forum
 
 ### Сборка приложения 
 ```
-go get -u github.com/Pickausernaame/technopark_db
 
+mkdir DB_Aplication
+cd DB_Aplication
+git clone git@github.com:Pickausernaame/technopark_db.git
+sudo docker build --tag=db .
+sudo docker run -p :5000:5000 db
+
+# Запуск функцианального тестирования
+./tech-db-forum func -u http://localhost:5000/api 
+
+# Запуск нагрузочного тестирования
+./tech-db-forum perf -u http://localhost:5000/api 
 ```
