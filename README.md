@@ -75,3 +75,9 @@ go build github.com/bozaro/tech-db-forum
 -k, --keep                            | Продолжить тестирование после первого упавшего теста
 -t, --tests[=.*]                      | Маска запускаемых тестов (регулярное выражение)
 -r, --report[=report.html]            | Имя файла для детального отчета о функциональном тестировании
+
+### Сборка приложения 
+```
+go get -u github.com/Pickausernaame/technopark_db
+
+```
